@@ -2,6 +2,7 @@ var express = require('express');
 var debug = require('debug')('raml-store');
 
 var path = require('path');
+var config = require('config');
 
 // creates dist-override/index.html
 var fs = require('fs');
@@ -31,6 +32,7 @@ module.exports = ramlServe = function (ramlPath) {
 
   var api = require('./api')(ramlPath);
   router.use(bodyParser.json());
+  router.get('/files', api.get);
   router.get('/files/*', api.get);
   router.post('/files/*', api.post);
   router.put('/files/*', api.put);
@@ -41,9 +43,9 @@ module.exports = ramlServe = function (ramlPath) {
 
 if (module.parent === null) {
   var app = express();
-  app.use('/', ramlServe(process.env.RAML_DATAPATH));
+  app.use('/', ramlServe(config.ramlPath));
 
-  var server = app.listen(process.env.PORT || 3000, function() {
+  var server = app.listen(config.port, function() {
     console.log('Express server listening on ' + server.address().address + ':' + server.address().port + '/');
   });
 }
