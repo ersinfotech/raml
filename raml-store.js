@@ -3,6 +3,7 @@ var debug = require('debug')('raml-store');
 
 var path = require('path');
 var config = require('config');
+var cors = require('cors');
 
 // creates dist-override/index.html
 var fs = require('fs');
@@ -31,6 +32,7 @@ module.exports = ramlServe = function (ramlPath) {
   var bodyParser = require('body-parser');
 
   var api = require('./api')(ramlPath);
+  router.use(cors());
   router.use(bodyParser.json());
   router.get('/files', api.get);
   router.get('/files/*', api.get);
