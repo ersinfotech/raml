@@ -4,6 +4,9 @@ var debug = require('debug')('raml-store');
 var path = require('path');
 var config = require('config');
 var cors = require('cors');
+var mkdirp = require('mkdirp');
+
+mkdirp.sync(config.ramlPath);
 
 // creates dist-override/editor.html
 var fs = require('fs');
