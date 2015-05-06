@@ -1,7 +1,8 @@
 node_modules/
 npm-debug.log
 
-dist-override/index.html
+dist-override/editor.html
+dist-override/console.html
 
 config/*
 !config/default.js
