@@ -1,7 +1,7 @@
 {
   "name": "raml",
   "version": "1.0.2",
-  "description": "raml console and editor",
+  "description": "raml console and editor combine together",
   "author": "mrgamer <mister.gamer@gmail.com",
   "contributors": [
     {
@@ -11,13 +11,17 @@
     {
       "name": "brianmc",
       "email": "bmgtech@gmail.com"
+    },
+    {
+      "name": "Jarvis Ao Ieong",
+      "email": "kinua1230@gmail.com"
     }
   ],
   "scripts": {
     "test": "node_modules/.bin/mocha -R spec test/",
     "start": "node-dev ."
   },
-  "main": "raml-store.js",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/mrgamer/express-raml-store"
