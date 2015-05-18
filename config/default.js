@@ -10,9 +10,11 @@ module.exports = {
     secret: 'thisissecret'
   },
 
+  clientId: null,
+
   eadmin: {
-    baseUrl: 'http://eadmin-api.ers.local',
-    clientId: 1
+    baseUrl: 'http://eadmin-api.ersinfotech.com'
   }
+
 }
 

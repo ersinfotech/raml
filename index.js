@@ -57,41 +57,46 @@ module.exports = ramlServe = function (ramlPath) {
   var router = express.Router();
   var bodyParser = require('body-parser');
 
-  var api = require('./api')(ramlPath);
   router.use(cors());
   router.use(bodyParser.json());
   router.use(bodyParser.urlencoded({extended: false}));
   router.use(cookieParser());
   router.use(cookieSession({secret: config.session.secret}));
-  router.get('/login', function (req, res) {
-    res.sendFile(__dirname + '/login.html');
-  })
-  router.post('/login', function (req, res) {
-    request.post(config.eadmin.baseUrl + '/oauth/signin')
-    .send({
-      client_id: config.eadmin.clientId,
-      email: req.body.email,
-      password: req.body.password
-    })
-    .end(function (err, response) {
-      if (err) {
-        return res.send(err.response.body);
-      };
-      req.session.accessToken = response.body.access_token;
-      res.redirect('/');
-    })
-  });
-  router.get('/logout', function (req, res) {
-    delete req.session.accessToken;
-    res.redirect('/login');
-  })
-  router.use(function (req, res, next) {
-    if (req.session.accessToken) {
-      next();
-    } else {
+
+  // Auth
+  if (config.clientId) {
+    router.get('/login', function (req, res) {
+      res.sendFile(__dirname + '/login.html');
+    });
+    router.post('/login', function (req, res) {
+      request.post(config.eadmin.baseUrl + '/oauth/signin')
+      .send({
+        client_id: config.clientId,
+        email: req.body.email,
+        password: req.body.password
+      })
+      .end(function (err, response) {
+        if (err) {
+          return res.send(err.response.body);
+        };
+        req.session.accessToken = response.body.access_token;
+        res.redirect('/');
+      });
+    });
+    router.get('/logout', function (req, res) {
+      delete req.session.accessToken;
       res.redirect('/login');
-    }
-  })
+    });
+    router.use(function (req, res, next) {
+      if (req.session.accessToken) {
+        next();
+      } else {
+        res.redirect('/login');
+      }
+    });
+  };
+
+  var api = require('./api')(ramlPath);
   router.get('/files', api.get);
   router.get('/files/*', api.get);
   router.post('/files/*', api.post);
