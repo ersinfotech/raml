@@ -4,17 +4,12 @@ module.exports = {
 
   port: process.env.PORT || 3000,
 
-  ramlPath: path.resolve(__dirname + '/../docs'),
+  path: path.resolve(__dirname + '/../raml'),
 
-  session: {
-    secret: 'thisissecret'
-  },
+  sessionSecret: 'thisissecret',
 
   clientId: null,
 
-  eadmin: {
-    baseUrl: 'http://eadmin-api.ersinfotech.com'
-  }
+  eadminBaseUrl: null
 
 }
-

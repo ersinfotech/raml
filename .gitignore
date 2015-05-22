@@ -7,4 +7,4 @@ dist-override/console.html
 config/*
 !config/default.js
 
-docs/*
+raml/*

@@ -1,30 +1,26 @@
+var fs = require('fs');
+var path = require('path');
+
 var express = require('express');
 var debug = require('debug')('raml-store');
-
-var path = require('path');
-var config = require('config');
 var cors = require('cors');
 var mkdirp = require('mkdirp');
 var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
 var request = require('superagent');
 
-mkdirp.sync(config.ramlPath);
-
-// creates dist-override/editor.html
-var fs = require('fs');
+// prepare file
 var editorFile = fs.readFileSync(path.join(__dirname, 'node_modules/api-designer/dist/index.html'), 'utf8');
-var consoleFile = fs.readFileSync(path.join(__dirname, 'node_modules/api-console/dist/index.html'), 'utf8');
-
 editorFile = editorFile.replace(/<\/body\>/g, '<script src="angular-persistence.js"></script></body>');
 fs.writeFileSync(path.join(__dirname, 'dist-override/editor.html'), editorFile, 'utf8');
 
-consoleFile = consoleFile.replace('<raml-initializer></raml-initializer>', '<raml-console src="/files/index.raml" disable-theme-switcher disable-raml-client-generator></raml-console>');
+var consoleFile = fs.readFileSync(path.join(__dirname, 'node_modules/api-console/dist/index.html'), 'utf8');
+consoleFile = consoleFile.replace('<raml-initializer></raml-initializer>', '<raml-console src="files/index.raml" disable-theme-switcher disable-raml-client-generator></raml-console>');
 fs.writeFileSync(path.join(__dirname, 'dist-override/console.html'), consoleFile, 'utf8');
 
 function serveEditor (req, res, next) {
   if (req.url === '/') {
-    return res.redirect('/editor/index.html');
+    return res.redirect('editor/index.html');
   };
   if (req.url === '/index.html') {
     return res.sendFile('/editor.html', { root: path.join(__dirname, 'dist-override') });
@@ -53,7 +49,22 @@ function serveConsole (req, res, next) {
 }
 
 var ramlServe;
-module.exports = ramlServe = function (ramlPath) {
+module.exports = ramlServe = function (options) {
+  options = options || {};
+  var sessionSecret = options.sessionSecret || 'secret';
+  var clientId = options.clientId;
+  var eadminBaseUrl = options.eadminBaseUrl;
+  var ramlPath = options.path;
+
+  if (!ramlPath) {
+    throw new Error('path required in raml settings');
+  };
+
+  mkdirp.sync(ramlPath);
+  if (!fs.existsSync(ramlPath + '/index.raml')) {
+    fs.writeFileSync(ramlPath + '/index.raml', "#%RAML 0.8\ntitle: Route to editor for editing");
+  };
+
   var router = express.Router();
   var bodyParser = require('body-parser');
 
@@ -61,17 +72,17 @@ module.exports = ramlServe = function (ramlPath) {
   router.use(bodyParser.json());
   router.use(bodyParser.urlencoded({extended: false}));
   router.use(cookieParser());
-  router.use(cookieSession({secret: config.session.secret}));
+  router.use(cookieSession({secret: sessionSecret}));
 
   // Auth
-  if (config.clientId) {
+  if (clientId) {
     router.get('/login', function (req, res) {
       res.sendFile(__dirname + '/login.html');
     });
     router.post('/login', function (req, res) {
-      request.post(config.eadmin.baseUrl + '/oauth/signin')
+      request.post(eadminBaseUrl + '/oauth/signin')
       .send({
-        client_id: config.clientId,
+        client_id: clientId,
         email: req.body.email,
         password: req.body.password
       })
@@ -80,18 +91,18 @@ module.exports = ramlServe = function (ramlPath) {
           return res.send(err.response.body);
         };
         req.session.accessToken = response.body.access_token;
-        res.redirect('/');
+        res.redirect('./');
       });
     });
     router.get('/logout', function (req, res) {
       delete req.session.accessToken;
-      res.redirect('/login');
+      res.redirect('login');
     });
     router.use(function (req, res, next) {
       if (req.session.accessToken) {
         next();
       } else {
-        res.redirect('/login');
+        res.redirect('login');
       }
     });
   };
@@ -108,8 +119,9 @@ module.exports = ramlServe = function (ramlPath) {
 };
 
 if (module.parent === null) {
+  var config = require('config');
   var app = express();
-  app.use('/', ramlServe(config.ramlPath));
+  app.use('/', ramlServe(config));
 
   var server = app.listen(config.port, function() {
     console.log('Express server listening on ' + server.address().address + ':' + server.address().port + '/');
