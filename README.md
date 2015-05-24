@@ -1,60 +1,35 @@
-# express-raml-store
-fork of [arthurtsang/raml-store](https://github.com/arthurtsang/raml-store), that is a fork of [brianmc/raml-store](https://github.com/brianmc/raml-store).  
-Is an Express module serving the awesome work of [mulesoft](https://github.com/mulesoft)/[api-designer](https://github.com/mulesoft/api-designer)  
+# raml
 
-Instead of saving to mongodb, it saves to the filesystem directly, exportes an handy [Express 4 Router](http://expressjs.com/guide/routing.html#express-router) that you can mount on your desired endpoint
+fork of [mrgamer/express-raml-store](https://github.com/mrgamer/express-raml-store).
 
-# requirement
-sorry for backwards incompatibility, but I love native promises, so this module requires [io.js 1.x](https://iojs.org/) or above.  
-It can be refactored to accept a promise library (as [bluebird](https://github.com/petkaantonov/bluebird)), instead of native Promises ([make a PR!](/pulls))
+Is a raml system combined raml-console and raml-designer togehter.
 
-# what
-This package is meant to be mounted on your express server when in development mode, allowing to edit the API specification on-the-fly and
-_ALSO_ test it (if your development server handles the API)
+It can use as a npm module that work as a express router.
 
-Example:
-```javascript
-var app = require('express');
-var ramlStore = require('express-raml-store');
+It also can work as standalone.
 
-// webpages
-app.get('/', serveMyHomePage);
-app.get('/admin/', greatAdminPanel);
+It has a login function for ers internal use.
 
-// REST API
-app.get('/api/', apiHandler);
+## Usage
 
-if (process.env.NODE_ENV !== 'production') {
-  app.use('/api-docs/', ramlStore(path.join(__dirname, 'raml-dir/')));
-}
+npm module
 
-// continue until...
-app.listen(3000)
-```
-
-
-# how to use
-Just include the module and specify the directory where you desire to host RAML files.
-
-```javascript
-var path = require('path');
-var express = require('express');
-var ramlStore = require('express-raml-store');
+```js
+var raml = require('raml');
 var app = express();
-
-app.use('/raml-store', ramlStore(path.join(__dirname, 'raml-dir/')));
-var server = app.listen(3000, function () {
-  console.log('Open http://localhost:%d/raml-store/ to browse api-designer', server.address().port);
-});
+app.use('/raml', raml({
+  path: __dirname + '/raml'
+}));
 ```
 
-express-raml-store also works as stand-alone:
+standalone
 
 ```shell
-$ RAML_DATAPATH=api-spec/raml/ node raml-store.js
+$ cp config/default.js config/development.js
+$ vi config/development.js
+$ npm start
 ```
 
-# TODO(s)
-I noticed that path traversing is not my best skill, as you see in the example I give up and suggest to use `path.join(__dirname, '<ramlPath>')`
-I think this is a good approach, but I'd rather make the library a little more clever on path solving.  
-PR are very welcome!
+## License
+
+MIT

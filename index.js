@@ -20,9 +20,9 @@ fs.writeFileSync(path.join(__dirname, 'dist-override/console.html'), consoleFile
 
 function serveEditor (req, res, next) {
   if (req.url === '/') {
-    return res.redirect('editor/index.html');
-  };
-  if (req.url === '/index.html') {
+    if (!req.originalUrl.match(/\/$/)) {
+      return res.redirect(req.originalUrl + '/');
+    };
     return res.sendFile('/editor.html', { root: path.join(__dirname, 'dist-override') });
   }
   if (req.url === '/angular-persistence.js') {
@@ -30,31 +30,29 @@ function serveEditor (req, res, next) {
   }
   var requestedFile = req.url.replace(/\?.*/, '');
   debug('requested:', requestedFile);
-  res.sendFile(requestedFile, { root: path.join(__dirname, 'node_modules/api-designer/dist') }, function (err) {
-    if (!!err && err.code === 'ENOENT') return res.sendStatus(404);
-    if (!!err) return next(err);
-  });
+  res.sendFile(requestedFile, { root: path.join(__dirname, 'node_modules/api-designer/dist') });
 }
 
 function serveConsole (req, res, next) {
-  if (req.url === '/index.html' || req.url === '/') {
+  if (req.url === '/') {
+    if (!req.originalUrl.match(/\/$/)) {
+      return res.redirect(req.originalUrl + '/');
+    };
     return res.sendFile('/console.html', { root: path.join(__dirname, 'dist-override') });
   }
   var requestedFile = req.url.replace(/\?.*/, '');
   debug('requested:', requestedFile);
-  res.sendFile(requestedFile, { root: path.join(__dirname, 'node_modules/api-console/dist') }, function (err) {
-    if (!!err && err.code === 'ENOENT') return res.sendStatus(404);
-    if (!!err) return next(err);
-  });
+  res.sendFile(requestedFile, { root: path.join(__dirname, 'node_modules/api-console/dist') });
 }
 
 var ramlServe;
 module.exports = ramlServe = function (options) {
   options = options || {};
-  var sessionSecret = options.sessionSecret || 'secret';
+
+  var ramlPath = options.path;
   var clientId = options.clientId;
   var eadminBaseUrl = options.eadminBaseUrl;
-  var ramlPath = options.path;
+  var sessionSecret = options.sessionSecret || 'secret';
 
   if (!ramlPath) {
     throw new Error('path required in raml settings');
@@ -91,18 +89,18 @@ module.exports = ramlServe = function (options) {
           return res.send(err.response.body);
         };
         req.session.accessToken = response.body.access_token;
-        res.redirect('./');
+        res.redirect(req.baseUrl || '/');
       });
     });
     router.get('/logout', function (req, res) {
       delete req.session.accessToken;
-      res.redirect('login');
+      res.redirect(req.baseUrl + '/login');
     });
     router.use(function (req, res, next) {
       if (req.session.accessToken) {
         next();
       } else {
-        res.redirect('login');
+        res.redirect(req.baseUrl + '/login');
       }
     });
   };
@@ -114,7 +112,7 @@ module.exports = ramlServe = function (options) {
   router.put('/files/*', api.put);
   router.delete('/files/*', api.delete);
   router.use('/editor', serveEditor);
-  router.use('/', serveConsole);
+  router.use(serveConsole);
   return router;
 };
 
