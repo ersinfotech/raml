@@ -2,7 +2,7 @@
 
 fork of [mrgamer/express-raml-store](https://github.com/mrgamer/express-raml-store).
 
-Is a raml system combined raml-console and raml-designer togehter.
+Is a raml system combined raml-console and raml-designer together.
 
 It can use as a npm module that work as a express router.
 
