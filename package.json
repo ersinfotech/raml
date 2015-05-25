@@ -1,34 +1,26 @@
 {
   "name": "@ersinfotech/raml",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "raml console and editor combine together",
-  "author": "mrgamer <mister.gamer@gmail.com",
+  "author": "jarvisaoieong <kinua1230@gmail.com>",
   "contributors": [
-    {
-      "name": "Arthur Tsang",
-      "email": "chiuwai.tsang@hp.com"
-    },
-    {
-      "name": "brianmc",
-      "email": "bmgtech@gmail.com"
-    },
     {
       "name": "Jarvis Ao Ieong",
       "email": "kinua1230@gmail.com"
     }
   ],
   "scripts": {
-    "test": "node_modules/.bin/mocha -R spec test/",
     "start": "node-dev ."
   },
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mrgamer/express-raml-store"
+    "url": "https://github.com/ersinfotech/raml"
   },
   "keywords": [
     "mulesoft",
     "raml",
+    "api-console",
     "api-designer",
     "express",
     "router"
@@ -49,21 +41,6 @@
     "superagent": "^1.2.0"
   },
   "license": "MIT",
-  "jscsConfig": {
-    "preset": "airbnb",
-    "esnext": true,
-    "requireCamelCaseOrUpperCaseIdentifiers": null,
-    "disallowMultipleVarDecl": true,
-    "requireMultipleVarDecl": null,
-    "disallowSpacesInFunctionDeclaration": null,
-    "disallowSpacesInFunctionExpression": null,
-    "disallowSpacesInAnonymousFunctionExpression": null
-  },
-  "jshintConfig": {
-    "esnext": true,
-    "node": true,
-    "mocha": true
-  },
   "devDependencies": {
     "chai": "^2.0.0",
     "mocha": "^2.1.0",
