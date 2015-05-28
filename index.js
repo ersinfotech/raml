@@ -50,6 +50,7 @@ module.exports = ramlServe = function (options) {
   options = options || {};
 
   var ramlPath = options.path;
+  var baseUrl = options.baseUrl;
   var clientId = options.clientId;
   var eadminBaseUrl = options.eadminBaseUrl;
   var sessionSecret = options.sessionSecret || 'secret';
@@ -61,6 +62,9 @@ module.exports = ramlServe = function (options) {
   mkdirp.sync(ramlPath);
   if (!fs.existsSync(ramlPath + '/index.raml')) {
     fs.writeFileSync(ramlPath + '/index.raml', "#%RAML 0.8\ntitle: Route to editor for editing");
+  };
+  if (baseUrl) {
+    fs.writeFileSync(ramlPath + '/base_url', baseUrl);
   };
 
   var router = express.Router();
