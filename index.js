@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 
+var fse = require('fs-extra');
 var express = require('express');
 var debug = require('debug')('raml-store');
 var cors = require('cors');
@@ -59,12 +60,24 @@ module.exports = ramlServe = function (options) {
     throw new Error('path required in raml settings');
   };
 
-  mkdirp.sync(ramlPath);
+  mkdirp.sync(ramlPath + '/_config');
+
   if (!fs.existsSync(ramlPath + '/index.raml')) {
-    fs.writeFileSync(ramlPath + '/index.raml', "#%RAML 0.8\ntitle: Route to editor for editing");
-  };
+    if (clientId) {
+      fse.copySync(__dirname + '/templates/oauth2.raml', ramlPath + '/index.raml');
+    } else {
+      fse.copySync(__dirname + '/templates/index.raml', ramlPath + '/index.raml');
+    }
+  }
   if (baseUrl) {
-    fs.writeFileSync(ramlPath + '/base_url', baseUrl);
+    fs.writeFileSync(ramlPath + '/_config/base_url', baseUrl);
+  };
+  if (clientId) {
+    fs.writeFileSync(ramlPath + '/_config/client_id', clientId);
+  };
+  if (eadminBaseUrl) {
+    fs.writeFileSync(ramlPath + '/_config/authorization_url', eadminBaseUrl + '/oauth/authorize');
+    fs.writeFileSync(ramlPath + '/_config/access_token_url', eadminBaseUrl + '/oauth/access_token');
   };
 
   var router = express.Router();
@@ -79,7 +92,7 @@ module.exports = ramlServe = function (options) {
   // Auth
   if (clientId) {
     router.get('/login', function (req, res) {
-      res.sendFile(__dirname + '/login.html');
+      res.sendFile(__dirname + '/templates/login.html');
     });
     router.post('/login', function (req, res) {
       request.post(eadminBaseUrl + '/oauth/signin')
