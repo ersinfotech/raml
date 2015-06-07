@@ -54,6 +54,7 @@ module.exports = ramlServe = function (options) {
   var baseUrl = options.baseUrl;
   var clientId = options.clientId;
   var eadminBaseUrl = options.eadminBaseUrl;
+  var disableCookieSession = options.disableCookieSession;
   var sessionSecret = options.sessionSecret || 'secret';
 
   if (!ramlPath) {
@@ -86,8 +87,10 @@ module.exports = ramlServe = function (options) {
   router.use(cors());
   router.use(bodyParser.json());
   router.use(bodyParser.urlencoded({extended: false}));
-  router.use(cookieParser());
-  router.use(cookieSession({secret: sessionSecret}));
+  if (!disableCookieSession) {
+    router.use(cookieParser());
+    router.use(cookieSession({secret: sessionSecret}));
+  };
 
   // Auth
   if (clientId) {
