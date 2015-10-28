@@ -1,6 +1,6 @@
 {
   "name": "@ersinfotech/raml",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "raml console and editor combine together",
   "author": "jarvisaoieong <kinua1230@gmail.com>",
   "contributors": [
@@ -26,8 +26,8 @@
     "router"
   ],
   "dependencies": {
-    "api-console": "^2.0.3",
-    "api-designer": "0.0.5",
+    "api-console": "2.0.4",
+    "api-designer": "0.0.6",
     "bluebird": "^2.9.25",
     "body-parser": "^1.12.0",
     "config": "^1.12.0",
